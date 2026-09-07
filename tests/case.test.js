@@ -1,0 +1,5 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {places,suspects,judge} from '../dist/case.js';
+test('Only one suspect/location/evidence combination solves the case',()=>{let solutions=[];for(const s of suspects)for(const l of ['役場の資料室','喫茶店の地下','隣町の郵便局'])for(let a=0;a<5;a++)for(let b=a+1;b<5;b++){let e=[places[a].id,places[b].id];if(judge(s,l,e))solutions.push([s,l,e])}assert.deepEqual(solutions,[[suspects[0],'役場の資料室',['hall','news']]])});
+test('Each investigation entrance is reachable from the starting position',()=>{const blocked=(x,z)=>Math.abs(x)>27||Math.abs(z)>28||places.some(p=>Math.abs(x-p.x)<p.w/2+.55&&Math.abs(z-p.z)<p.d/2+.55)||Math.hypot(x,z)<2.1;const queue=[[0,-21]],seen=new Set(['0,-21']);for(let i=0;i<queue.length;i++){const [x,z]=queue[i];for(const [dx,dz]of [[1,0],[-1,0],[0,1],[0,-1]]){let a=x+dx,b=z+dz,k=a+','+b;if(!seen.has(k)&&!blocked(a,b)){seen.add(k);queue.push([a,b])}}}for(const p of places)assert(queue.some(([x,z])=>Math.hypot(x-p.x,z-(p.z-p.d/2-1))<5.5),p.name)});
